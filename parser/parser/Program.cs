@@ -1,43 +1,124 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net;
+using System.Text;
 
 namespace parser
 {
+    
     class Program
     {
+        static string PathPre = "C:\\Users\\Персональный\\Desktop\\проги\\stream\\reqwest";
+        static string Type = ".txt";
         static void Main(string[] args)
         {
-            
-            string end;
-            string url = "https://raw.githubusercontent.com/vinta/awesome-python/master/README.md";
-            var request = (HttpWebRequest)WebRequest.Create(url);// создание запроса по  url запрос. используем upncast
+            string Url = "https://raw.githubusercontent.com/vinta/awesome-python/master/README.md";
+            string Text;
 
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();// создание ответа по запросу. используем приведение типов
-            Stream stream = response.GetResponseStream();//переводим в текст ответ
-            using (StreamReader streamReader = new StreamReader(stream) )//создаём SR для чтения в строки
+            Text = ResponsOnReqwest(Url);
+            Text = WorkText_I_(Text);
+            //Exoud[] exo = CreatClass(Text);
+
+        }
+
+        static Exoud[] CreatClass(string text)
+        {
+            string[] TextLine = text.Split('\n');
+            string[] name;
+            string[] repo;
+            string[] url = CreatClassName(TextLine, out name, out repo);
+            Exoud[] exoud = new Exoud[TextLine.Length];
+            int EIndex = 0;
+
+            foreach (var v in TextLine)
             {
-                end = streamReader.ReadToEnd();
+                exoud[EIndex] = new Exoud();
+                exoud[EIndex].TextAnatation = v;
+                exoud[EIndex].User = name[EIndex];
+                exoud[EIndex].Repo = repo[EIndex];
+                exoud[EIndex].Url = url[EIndex];
+
+                EIndex++;
             }
 
-
-            string[] LinesString = end.Split('\n');
-            using (StreamWriter sw = new StreamWriter("C:\\Users\\Персональный\\Desktop\\проги\\stream.txt"))//создаём SW для записи в фаил
+            return exoud;
+        }
+        static string[] CreatClassName(string[] Line, out string[] name, out string[] repo)
+        {
+            name = new string[Line.Length];
+            repo = new string[Line.Length];
+            for (int i = 0; i < Line.Length; i++)
             {
-                
-                foreach (string i in LinesString)
+                StringBuilder sb = new StringBuilder();
+                int ISart = Line[i].IndexOf("(");
+                int IEnd = Line[i].IndexOf(")");
+
+                for (int j = ISart + 1; j < IEnd; j++ )
                 {
-                    if (i.StartsWith('*'))//если *
+                    sb.Append(Line[i][j]);
+                }
+                Line[i] = sb.ToString();
+                //dopili metod
+                string line = Line[i];
+                sb = new StringBuilder();
+                ISart = line.IndexOf('/');
+                IEnd = line.IndexOf('\n');
+
+                for (int j = 0; j < ISart; j++)
+                {
+                    sb.Append(line[j]);
+                }
+                name[i] = sb.ToString();
+                sb = new StringBuilder();
+
+                for (int j = ISart + 1; j < IEnd; j++)
+                {
+                    sb.Append(line[j]);
+                }
+                repo[i] = sb.ToString();
+            }
+
+            return Line;
+        }
+        static string DeleteGithub_cum(string str)
+        {
+            return str;
+        }
+        static string ResponsOnReqwest(string Url)
+        {
+            WebClient webClient = new WebClient();
+            string reqwest = webClient.DownloadString(Url);
+
+            return reqwest;
+        }
+        static string WorkText_I_(string text)
+        {
+            string str;
+            string[] TextLine = text.Split('\n');
+
+            using (StreamWriter sw = new StreamWriter(PathPre + "2" + Type))
+            {
+                foreach (var v in TextLine)
+                {
+                    v.TrimStart(' ');
+                    if (v.StartsWith("* ["))
                     {
-                        sw.WriteLine(i, true);
+                        sw.WriteLine(v, true);
                     }
-                    
                 }
             }
+            using (StreamReader sr = new StreamReader(PathPre + "2" + Type))
+            {
+                str = sr.ToString();
+            }
 
-            
-
-            //Console.WriteLine(end);
+            return str;
+        }
+        static void WriteFiel_I_(string text)
+        {
+            using (StreamWriter sw = new StreamWriter(PathPre + "1" + Type))
+            {
+                sw.WriteLine(text);
+            }
         }
     }
 }
