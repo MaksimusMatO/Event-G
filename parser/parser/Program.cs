@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 
@@ -16,7 +17,8 @@ namespace parser
 
             Text = ResponsOnReqwest(Url);
             Text = WorkText_I_(Text);
-            //Exoud[] exo = CreatClass(Text);
+            Exoud[] exo = CreatClass(Text);
+            PrintClasInfo(exo);
 
         }
 
@@ -36,6 +38,7 @@ namespace parser
                 exoud[EIndex].User = name[EIndex];
                 exoud[EIndex].Repo = repo[EIndex];
                 exoud[EIndex].Url = url[EIndex];
+                exoud[EIndex].ParseStar();
 
                 EIndex++;
             }
@@ -57,31 +60,53 @@ namespace parser
                     sb.Append(Line[i][j]);
                 }
                 Line[i] = sb.ToString();
-                //dopili metod
                 string line = Line[i];
-                sb = new StringBuilder();
-                ISart = line.IndexOf('/');
-                IEnd = line.IndexOf('\n');
 
-                for (int j = 0; j < ISart; j++)
+                if (line.StartsWith("https://github.com/"))
                 {
-                    sb.Append(line[j]);
-                }
-                name[i] = sb.ToString();
-                sb = new StringBuilder();
+                    line = line.Remove(0, 19);
 
-                for (int j = ISart + 1; j < IEnd; j++)
-                {
-                    sb.Append(line[j]);
+
+                    sb = new StringBuilder();
+                    ISart = line.IndexOf('/');
+                    IEnd = line.Length;
+
+                    for (int j = 0; j < ISart; j++)
+                    {
+                        sb.Append(line[j]);
+                    }
+                    name[i] = sb.ToString();
+                    sb = new StringBuilder();
+
+                    for (int j = ISart + 1; j < IEnd ; j++)
+                    {
+                        sb.Append(line[j]);
+                    }
+                    repo[i] = sb.ToString();
                 }
-                repo[i] = sb.ToString();
+                else
+                {
+                    continue;
+                }
             }
 
             return Line;
         }
-        static string DeleteGithub_cum(string str)
+        static void PrintClasInfo(Exoud[] exo)
         {
-            return str;
+            using (StreamWriter sw = new StreamWriter(PathPre + '3' + Type))
+            {
+                foreach (var v in exo)
+                {
+
+                    sw.WriteLine("{0}::{1}::{2}::{3}::{4}",
+                        v.TextAnatation,
+                        v.User,
+                        v.Repo,
+                        v.Url,
+                        v.Star);
+                }
+            }
         }
         static string ResponsOnReqwest(string Url)
         {
@@ -108,7 +133,7 @@ namespace parser
             }
             using (StreamReader sr = new StreamReader(PathPre + "2" + Type))
             {
-                str = sr.ToString();
+                str = sr.ReadToEnd();
             }
 
             return str;
