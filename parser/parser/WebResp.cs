@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -12,7 +13,6 @@ namespace parser
         static Regex regex = null;
         static string WResponse = null;
         static string[] LineStr = null;
-
         public void StartWebResp(string addres)
         {
             WResponse = WClient.DownloadString(addres);
@@ -24,7 +24,6 @@ namespace parser
             
 
         }
-
         static string[] FilterRespons()
         {
             string[] TempLine = WResponse.Split('\n');
@@ -38,7 +37,10 @@ namespace parser
                 if ( stat )
                 {
                     Str[IndexStr] = v;
-                    //Console.WriteLine(v);
+                    //Thread.Sleep(600);
+
+                    Console.WriteLine(v.TrimStart(' '));
+
                     IndexStr++;
                 }
                 

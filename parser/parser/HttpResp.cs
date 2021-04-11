@@ -50,7 +50,6 @@ namespace parser
                 }
             }
         }
-
         static string CreateUrl(string str)
         {
             string pref = "https://api.github.com/repos/";
